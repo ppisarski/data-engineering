@@ -1,0 +1,42 @@
+version: "3"
+services:
+  db:
+    image: postgres
+    ports:
+      - "54320:5432"
+    networks:
+      - net
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=docker
+    deploy:
+      replicas: 1
+      resources:
+        limits:
+          cpus: "1"
+          memory: 1G
+      restart_policy:
+        condition: on-failure
+
+  admin:
+    image: dpage/pgadmin4
+    ports:
+      - "80:80"
+    networks:
+      - net
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=postgres@docker
+      - PGADMIN_DEFAULT_PASSWORD=docker
+    deploy:
+      resources:
+        limits:
+          cpus: "1"
+      restart_policy:
+        condition: on-failure
+
+networks:
+  net:
+volumes:
+  db-data:
