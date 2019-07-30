@@ -1,0 +1,53 @@
+version: "3"
+services:
+  db:
+    image: crunchydata/crunchy-postgres-gis:centos7-11.4-2.4.1
+    ports:
+      - "54320:5432"
+    networks:
+      db-network:
+        aliases:
+          - pgdb
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    environment:
+      - PG_PRIMARY_USER=postgres
+      - PG_PRIMARY_PASSWORD=docker
+      - PG_USER=postgres
+      - PG_PASSWORD=docker
+      - PG_ROOT_PASSWORD=password
+      - PG_MODE=primary
+      - PG_DATABASE=userdb
+      - PG_PRIMARY_PORT=5432
+    deploy:
+      replicas: 1
+      resources:
+        limits:
+          cpus: "1"
+          memory: 1G
+      restart_policy:
+        condition: on-failure
+
+  admin:
+    image: crunchydata/crunchy-pgadmin4:centos7-11.4-2.4.1
+    ports:
+      - "8080:5050"
+    networks:
+      db-network:
+        aliases:
+          - pgadmin
+    environment:
+      - PGADMIN_SETUP_EMAIL=postgres@docker
+      - PGADMIN_SETUP_PASSWORD=docker
+      - SERVER_PORT=5050
+    deploy:
+      resources:
+        limits:
+          cpus: "1"
+      restart_policy:
+        condition: on-failure
+
+networks:
+  db-network:
+volumes:
+  db-data:
